@@ -1,3 +1,20 @@
+<?php
+session_start();
+$error = "";
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    if ($username === 'Karala' && $password === '1234') {
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = 'CEO';
+        header("Location: dashboard.php");
+        exit;
+    } else {
+        $error = "Username atau password salah, silahkan coba lagi!";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -169,12 +186,15 @@
 </head>
 <body>
      <div class="login-container fade-in">
-    <h2>Login SKY MART</h2>
+    <h2>LOGIN SKY MART</h2>
     <form method="POST">
         <input type="text" name="username" placeholder="Username" required><br>
         <input type="password" name="password" placeholder="Password" required><br>
         <button type="submit" name="login">Login</button>
          <button type="submit" name="Cancel">Cancel</button>
+           <?php if ($error): ?>
+            <p class="error"><?= $error ?></p>
+        <?php endif; ?>
     </form>
 </div>
     </body>
