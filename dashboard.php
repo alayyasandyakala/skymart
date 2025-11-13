@@ -183,13 +183,16 @@ for ($i = 0; $i < count($nama_barang); $i++) {
                 <td><?= $kode_barang[$i]; ?></td>
                 <td><?= $nama_barang[$i]; ?></td>
                 <td>Rp <?= number_format($harga_barang[$i], 0, ',', '.'); ?></td>
-                <td><?= $jumlah[$i]; ?></td>
+                 <td><?= $jumlah[$i]; ?></td>
                 <td>Rp <?= number_format($total[$i], 0, ',', '.'); ?></td>
             </tr>
             <?php endfor; ?>
+             <tr>
+            <td colspan="4" style="text-align:right;font-weight:bold;">Grand Total</td>
+            <td style="font-weight:bold;">Rp<?= number_format($grandtotal, 0, ',', '.'); ?></td>
+        </tr>
         </tbody>
     </table>
-
     <div class="footer">
         © <?= date("Y"); ?> SKY MART • Dashboard Modern
     </div>
