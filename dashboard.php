@@ -40,24 +40,19 @@ for ($i = 0; $i < count($nama_barang); $i++) {
     }
 
     /* ==== LOGO DI TENGAH ATAS ==== */
-    .logo-center {
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 2em;
-        font-weight: bold;
-        color: #fff;
-        letter-spacing: 1px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        z-index: 10;
-    }
+  .logo-center {
+    font-size: 2em;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.logo-center span {
+    color: #007bff;
+}
 
-    .logo-center span {
-        color: #007bff;
-    }
 
     /* ==== DASHBOARD ==== */
     .dashboard {
@@ -155,7 +150,12 @@ for ($i = 0; $i < count($nama_barang); $i++) {
 <!-- Konten utama -->
 <div class="dashboard">
 
-    <!-- Bar atas daftar barang (sudah ditukar posisi) -->
+    <!-- Logo tengah di dalam dashboard -->
+    <div class="logo-center" style="position: static; transform: none; justify-content: center; margin-bottom: 20px;">
+        <span>SKY MART</span>
+    </div>
+
+    <!-- Bar atas daftar barang -->
     <div class="table-header">
         <div class="user-info">
             <h3>Selamat Datang, <?= htmlspecialchars($_SESSION['username']); ?>!</h3>
@@ -164,7 +164,6 @@ for ($i = 0; $i < count($nama_barang); $i++) {
 
         <a href="logout.php" class="logout-btn">Logout</a>
     </div>
-
     <h2>Daftar Barang</h2>
 
     <table>
@@ -191,7 +190,48 @@ for ($i = 0; $i < count($nama_barang); $i++) {
             <td colspan="4" style="text-align:right;font-weight:bold;">Grand Total</td>
             <td style="font-weight:bold;">Rp<?= number_format($grandtotal, 0, ',', '.'); ?></td>
         </tr>
-        </tbody>
+        <?php
+    // Hitung diskon
+    if ($grandtotal <= 50000) {
+        $diskon_persen = 5;
+    } elseif ($grandtotal <= 100000) {
+        $diskon_persen = 10;
+    } else {
+        $diskon_persen = 20;
+    }
+
+    $nilai_diskon = ($grandtotal * $diskon_persen) / 100;
+    $total_setelah_diskon = $grandtotal - $nilai_diskon;
+
+    // Simulasi uang bayar dan kembalian
+    $uang_bayar = $total_setelah_diskon + rand(10000, 50000); // pelanggan bayar lebih
+    $kembalian = $uang_bayar - $total_setelah_diskon;
+    ?>
+
+    <!-- Diskon -->
+    <tr>
+        <td colspan="4" style="text-align:right;font-weight:bold;">Diskon (<?= $diskon_persen ?>%)</td>
+        <td style="font-weight:bold;">- Rp<?= number_format($nilai_diskon, 0, ',', '.'); ?></td>
+    </tr>
+
+    <!-- Total Pembayaran -->
+    <tr>
+        <td colspan="4" style="text-align:right;font-weight:bold;">Total Pembayaran</td>
+        <td style="font-weight:bold;">Rp<?= number_format($total_setelah_diskon, 0, ',', '.'); ?></td>
+    </tr>
+
+    <!-- Uang Bayar -->
+    <tr>
+        <td colspan="4" style="text-align:right;font-weight:bold;">Uang Bayar</td>
+        <td style="font-weight:bold;">Rp<?= number_format($uang_bayar, 0, ',', '.'); ?></td>
+    </tr>
+
+    <!-- Kembalian -->
+    <tr>
+        <td colspan="4" style="text-align:right;font-weight:bold;">Kembalian</td>
+        <td style="font-weight:bold;">Rp<?= number_format($kembalian, 0, ',', '.'); ?></td>
+    </tr>
+</tbody>
     </table>
     <div class="footer">
         © <?= date("Y"); ?> SKY MART • Dashboard Modern
