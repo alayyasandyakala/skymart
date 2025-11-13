@@ -11,6 +11,18 @@ if (!isset($_SESSION['username'])) {
 $kode_barang = ["B001", "B002", "B003", "B004", "B005"];
 $nama_barang = ["Sabun", "Sampo", "Pasta Gigi", "Tisu", "Detergen"];
 $harga_barang = [8000, 15000, 12000, 10000, 20000];
+
+$beli = [];
+$jumlah = [];
+$total = [];
+$grandtotal = 0;
+
+// Tentukan jumlah beli acak untuk tiap barang
+for ($i = 0; $i < count($nama_barang); $i++) {
+    $jumlah[$i] = rand(1, 5);
+    $total[$i] = $harga_barang[$i] * $jumlah[$i];
+    $grandtotal += $total[$i];
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -161,6 +173,8 @@ $harga_barang = [8000, 15000, 12000, 10000, 20000];
                 <th>Kode Barang</th>
                 <th>Nama Barang</th>
                 <th>Harga</th>
+                <th>Jumlah Beli</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
@@ -169,6 +183,8 @@ $harga_barang = [8000, 15000, 12000, 10000, 20000];
                 <td><?= $kode_barang[$i]; ?></td>
                 <td><?= $nama_barang[$i]; ?></td>
                 <td>Rp <?= number_format($harga_barang[$i], 0, ',', '.'); ?></td>
+                <td><?= $jumlah[$i]; ?></td>
+                <td>Rp <?= number_format($total[$i], 0, ',', '.'); ?></td>
             </tr>
             <?php endfor; ?>
         </tbody>
