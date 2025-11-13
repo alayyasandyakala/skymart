@@ -6,113 +6,176 @@ if (!isset($_SESSION['username'])) {
     header("Location: index.php");
     exit;
 }
+
+// Data contoh
+$kode_barang = ["B001", "B002", "B003", "B004", "B005"];
+$nama_barang = ["Sabun", "Sampo", "Pasta Gigi", "Tisu", "Detergen"];
+$harga_barang = [8000, 15000, 12000, 10000, 20000];
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard | POLGAN MART</title>
+<title>Dashboard | SKY MART</title>
 <style>
-    /* 🌸 Desain Modern Dashboard POLGAN MART */
     body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #89f7fe, #66a6ff);
+        color: #fff;
         margin: 0;
         padding: 0;
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #f5f7fa, #e4ebf5);
-        height: 100vh;
+    }
+
+    /* ==== LOGO DI TENGAH ATAS ==== */
+    .logo-center {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 2em;
+        font-weight: bold;
+        color: #fff;
+        letter-spacing: 1px;
         display: flex;
-        justify-content: center;
         align-items: center;
-        color: #333;
+        gap: 8px;
+        z-index: 10;
     }
 
+    .logo-center span {
+        color: #007bff;
+    }
+
+    /* ==== DASHBOARD ==== */
     .dashboard {
-        background: #ffffff;
-        padding: 40px;
+        margin-top: 120px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
         border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        width: 380px;
-        text-align: center;
-        transition: all 0.3s ease-in-out;
+        width: 85%;
+        max-width: 950px;
+        padding: 30px;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
 
-    .dashboard:hover {
-        transform: scale(1.02);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    /* ==== HEADER DI ATAS TABEL ==== */
+    .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .logout-btn {
+        background: linear-gradient(135deg, #ff5f6d, #ffc371);
+        padding: 8px 18px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .user-info {
+        text-align: left;
+    }
+
+    .user-info h3 {
+        margin: 0;
+        font-size: 1em;
+        font-weight: 600;
+    }
+
+    .user-info p {
+        margin: 3px 0 0 0;
+        font-size: 0.9em;
+        opacity: 0.9;
     }
 
     h2 {
-        color: #222;
-        font-weight: 600;
-        margin-bottom: 10px;
+        color: #fff;
+        text-align: center;
+        margin-top: 0;
     }
 
-    p {
-        margin: 8px 0;
-        font-size: 15px;
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
     }
 
-    .role-box {
-        display: inline-block;
-        background: #eaf8ff;
-        color: #007bff;
-        font-weight: 500;
-        padding: 6px 12px;
-        border-radius: 20px;
-        margin-top: 5px;
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.3);
+        text-align: center;
     }
 
-    a.logout-btn {
-        display: inline-block;
-        margin-top: 25px;
-        background: linear-gradient(135deg, #ff6b6b, #d9534f);
-        color: white;
-        text-decoration: none;
-        padding: 10px 25px;
-        border-radius: 8px;
-        font-weight: 500;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease-in-out;
+    th {
+        background: rgba(255,255,255,0.25);
     }
 
-    a.logout-btn:hover {
-        background: linear-gradient(135deg, #ff4b4b, #c9302c);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 10px rgba(255, 107, 107, 0.3);
+    tr:hover {
+        background: rgba(255,255,255,0.1);
     }
 
     .footer {
-        margin-top: 30px;
-        font-size: 13px;
-        color: #888;
-    }
-
-    .emoji {
-        font-size: 35px;
-        margin-bottom: 10px;
-        animation: float 2s ease-in-out infinite;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-5px); }
+        margin-top: 25px;
+        font-size: 14px;
+        opacity: 0.8;
+        text-align: center;
     }
 </style>
 </head>
 <body>
 
-<div class="dashboard">
-    <div class="emoji">👋</div>
-    <h2>Selamat Datang, <span style="color:#007bff;"><?php echo htmlspecialchars($_SESSION['username']); ?></span>!</h2>
-    <p>Anda login sebagai:</p>
-    <div class="role-box"><?php echo htmlspecialchars($_SESSION['role']); ?></div>
+<!-- Logo tengah atas -->
+<div class="logo-center">
+<span>SKY MART</span>
+</div>
 
-    <br>
-    <a href="logout.php" class="logout-btn">Logout</a>
+<!-- Konten utama -->
+<div class="dashboard">
+
+    <!-- Bar atas daftar barang (sudah ditukar posisi) -->
+    <div class="table-header">
+        <div class="user-info">
+            <h3>Selamat Datang, <?= htmlspecialchars($_SESSION['username']); ?>!</h3>
+            <p>Role: <?= htmlspecialchars($_SESSION['role']); ?></p>
+        </div>
+
+        <a href="logout.php" class="logout-btn">Logout</a>
+    </div>
+
+    <h2>Daftar Barang</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kode Barang</th>
+                <th>Nama Barang</th>
+                <th>Harga</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php for ($i = 0; $i < count($kode_barang); $i++): ?>
+            <tr>
+                <td><?= $kode_barang[$i]; ?></td>
+                <td><?= $nama_barang[$i]; ?></td>
+                <td>Rp <?= number_format($harga_barang[$i], 0, ',', '.'); ?></td>
+            </tr>
+            <?php endfor; ?>
+        </tbody>
+    </table>
 
     <div class="footer">
-        © <?php echo date("Y"); ?> SKY MART • Dashboard Modern
+        © <?= date("Y"); ?> SKY MART • Dashboard Modern
     </div>
 </div>
 

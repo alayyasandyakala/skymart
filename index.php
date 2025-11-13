@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['login'])) {
 
     if ($username === 'Karala' && $password === '1234') {
         $_SESSION['username'] = $username;
-        $_SESSION['role'] = 'CEO';
+        $_SESSION['role'] = 'ADMIN';
         header("Location: dashboard.php");
         exit;
     } else {
