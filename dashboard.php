@@ -1,35 +1,79 @@
 <?php
 session_start();
 
-// Cek apakah user sudah login
+// ===============================================================
+// CEK LOGIN
+// ===============================================================
 if (!isset($_SESSION['username'])) {
     header("Location: index.php");
     exit;
 }
 
-// Data contoh
-$kode_barang = ["B001", "B002", "B003", "B004", "B005"];
-$nama_barang = ["Sabun", "Sampo", "Pasta Gigi", "Tisu", "Detergen"];
-$harga_barang = [8000, 15000, 12000, 10000, 20000];
+// ===============================================================
+// 1. KERANJANG BELANJA (MANUAL)
+// ===============================================================
 
-$beli = [];
-$jumlah = [];
-$total = [];
-$grandtotal = 0;
-
-// Tentukan jumlah beli acak untuk tiap barang
-for ($i = 0; $i < count($nama_barang); $i++) {
-    $jumlah[$i] = rand(1, 5);
-    $total[$i] = $harga_barang[$i] * $jumlah[$i];
-    $grandtotal += $total[$i];
+// buat keranjang jika belum ada
+if (!isset($_SESSION['keranjang'])) {
+    $_SESSION['keranjang'] = [];
 }
+
+// tombol tambah barang
+if (isset($_POST['tambah'])) {
+    $kode   = $_POST['kode'];
+    $nama   = $_POST['nama'];
+    $harga  = (int)$_POST['harga'];
+    $jumlah = (int)$_POST['jumlah'];
+
+    $total = $harga * $jumlah;
+
+    $_SESSION['keranjang'][] = [
+        'kode'   => $kode,
+        'nama'   => $nama,
+        'harga'  => $harga,
+        'jumlah' => $jumlah,
+        'total'  => $total
+    ];
+}
+
+// tombol reset keranjang
+if (isset($_POST['reset'])) {
+    $_SESSION['keranjang'] = [];
+}
+
+// hitung total keranjang
+$totalBelanja = 0;
+foreach ($_SESSION['keranjang'] as $item) {
+    $totalBelanja += $item['total'];
+}
+
+// atur diskon
+if ($totalBelanja <= 50000) {
+    $diskonPersen = 5;
+} elseif ($totalBelanja <= 100000) {
+    $diskonPersen = 10;
+} else {
+    $diskonPersen = 20;
+}
+
+$diskon = ($totalBelanja * $diskonPersen) / 100;
+$totalBayar = $totalBelanja - $diskon;
+
+$dataBarang = [
+    "BRG001" => ["nama" => "Sabun Mandi", "harga" => 15000],
+    "BRG002" => ["nama" => "Sikat Gigi", "harga" => 12000],
+    "BRG003" => ["nama" => "Pasta Gigi", "harga" => 20000],
+    "BRG004" => ["nama" => "Shampoo", "harga" => 25000],
+    "BRG005" => ["nama" => "Handuk", "harga" => 30000],
+];
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard | SKY MART</title>
+
 <style>
     body {
         font-family: 'Poppins', sans-serif;
@@ -39,25 +83,19 @@ for ($i = 0; $i < count($nama_barang); $i++) {
         padding: 0;
     }
 
-    /* ==== LOGO DI TENGAH ATAS ==== */
-  .logo-center {
-    font-size: 2em;
-    font-weight: bold;
-    color: #fff;
-    letter-spacing: 1px;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-.logo-center span {
-    color: #007bff;
-}
+    /* LOGO TENGAH */
+    .logo-center {
+        font-size: 2em;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .logo-center span { color: #007bff; }
 
-
-    /* ==== DASHBOARD ==== */
+    /* DASHBOARD */
     .dashboard {
-        margin-top: 120px;
-        background: rgba(255, 255, 255, 0.15);
+        margin-top: 70px;
+        background: rgba(255,255,255,0.15);
         backdrop-filter: blur(15px);
         border-radius: 20px;
         width: 85%;
@@ -68,12 +106,73 @@ for ($i = 0; $i < count($nama_barang); $i++) {
         box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
 
-    /* ==== HEADER DI ATAS TABEL ==== */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background: rgba(255,255,255,0.15);
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+
+    tr:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    /* FORM INPUT */
+    .input-box {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-top: 25px;
+        color: black;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: white;
+    font-size: 15px;
+}
+
+    button {
+        padding: 10px 45px;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+
+    .btn-blue { background: #1e90ff; }
+    .btn-red { background: #dc3545; }
+
+    .footer {
+        margin-top: 30px;
+        text-align: center;
+        opacity: 0.8;
+    }
+
     .table-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
     }
 
     .logout-btn {
@@ -83,160 +182,111 @@ for ($i = 0; $i < count($nama_barang); $i++) {
         text-decoration: none;
         color: white;
         font-weight: bold;
-        transition: 0.3s;
-    }
-
-    .logout-btn:hover {
-        transform: scale(1.05);
-    }
-
-    .user-info {
-        text-align: left;
-    }
-
-    .user-info h3 {
-        margin: 0;
-        font-size: 1em;
-        font-weight: 600;
-    }
-
-    .user-info p {
-        margin: 3px 0 0 0;
-        font-size: 0.9em;
-        opacity: 0.9;
-    }
-
-    h2 {
-        color: #fff;
-        text-align: center;
-        margin-top: 0;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
-
-    th, td {
-        padding: 12px;
-        border-bottom: 1px solid rgba(255,255,255,0.3);
-        text-align: center;
-    }
-
-    th {
-        background: rgba(255,255,255,0.25);
-    }
-
-    tr:hover {
-        background: rgba(255,255,255,0.1);
-    }
-
-    .footer {
-        margin-top: 25px;
-        font-size: 14px;
-        opacity: 0.8;
-        text-align: center;
     }
 </style>
 </head>
 <body>
 
-<!-- Logo tengah atas -->
-<div class="logo-center">
-<span>SKY MART</span>
-</div>
+<div class="logo-center"><span>SKY MART</span></div>
 
-<!-- Konten utama -->
 <div class="dashboard">
 
-    <!-- Logo tengah di dalam dashboard -->
-    <div class="logo-center" style="position: static; transform: none; justify-content: center; margin-bottom: 20px;">
-        <span>SKY MART</span>
-    </div>
-
-    <!-- Bar atas daftar barang -->
+    <!-- HEADER USER -->
     <div class="table-header">
-        <div class="user-info">
-            <h3>Selamat Datang, <?= htmlspecialchars($_SESSION['username']); ?>!</h3>
+        <div>
+            <h3>Selamat Datang, <?= htmlspecialchars($_SESSION['username']); ?></h3>
             <p>Role: <?= htmlspecialchars($_SESSION['role']); ?></p>
         </div>
-
         <a href="logout.php" class="logout-btn">Logout</a>
     </div>
-    <h2>Daftar Barang</h2>
+
+    <!-- FORM INPUT MANUAL -->
+    <div class="input-box">
+        <h3>Input Barang</h3>
+
+        <form method="POST">
+            <label>Kode Barang</label>
+            <select id="kode" name="kode" required>
+                <option value="" disabled selected>Pilih Kode Barang</option>
+                <?php foreach ($dataBarang as $kode => $b): ?>
+                    <option value="<?= $kode ?>"><?= $kode ?> - <?= $b['nama'] ?></option>
+                <?php endforeach; ?>
+            </select>
+
+            <label>Nama Barang</label>
+            <input id="nama" type="text" name="nama" required readonly>
+
+            <label>Harga Barang</label>
+            <input id="harga" type="number" name="harga" required readonly>
+
+            <label>Jumlah</label>
+            <input type="number" name="jumlah" required>
+
+            <button class="btn-blue" name="tambah">Tambahkan</button>
+            <button class="btn-red" name="reset">Kosongkan Keranjang</button>
+        </form>
+    </div>
+
+    <!-- TABEL KERANJANG -->
+    <h3>Keranjang Belanja</h3>
 
     <table>
-        <thead>
-            <tr>
-                <th>Kode Barang</th>
-                <th>Nama Barang</th>
-                <th>Harga</th>
-                <th>Jumlah Beli</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php for ($i = 0; $i < count($kode_barang); $i++): ?>
-            <tr>
-                <td><?= $kode_barang[$i]; ?></td>
-                <td><?= $nama_barang[$i]; ?></td>
-                <td>Rp <?= number_format($harga_barang[$i], 0, ',', '.'); ?></td>
-                 <td><?= $jumlah[$i]; ?></td>
-                <td>Rp <?= number_format($total[$i], 0, ',', '.'); ?></td>
-            </tr>
-            <?php endfor; ?>
-             <tr>
-            <td colspan="4" style="text-align:right;font-weight:bold;">Grand Total</td>
-            <td style="font-weight:bold;">Rp<?= number_format($grandtotal, 0, ',', '.'); ?></td>
+        <tr>
+            <th>Kode</th>
+            <th>Nama Barang</th>
+            <th>Harga</th>
+            <th>Jumlah</th>
+            <th>Total</th>
         </tr>
-        <?php
-    // Hitung diskon
-    if ($grandtotal <= 50000) {
-        $diskon_persen = 5;
-    } elseif ($grandtotal <= 100000) {
-        $diskon_persen = 10;
-    } else {
-        $diskon_persen = 20;
-    }
 
-    $nilai_diskon = ($grandtotal * $diskon_persen) / 100;
-    $total_setelah_diskon = $grandtotal - $nilai_diskon;
+        <?php foreach ($_SESSION['keranjang'] as $item): ?>
+        <tr>
+            <td><?= $item['kode'] ?></td>
+            <td><?= $item['nama'] ?></td>
+            <td>Rp <?= number_format($item['harga'],0,',','.') ?></td>
+            <td><?= $item['jumlah'] ?></td>
+            <td>Rp <?= number_format($item['total'],0,',','.') ?></td>
+        </tr>
+        <?php endforeach; ?>
 
-    // Simulasi uang bayar dan kembalian
-    $uang_bayar = $total_setelah_diskon + rand(10000, 50000); // pelanggan bayar lebih
-    $kembalian = $uang_bayar - $total_setelah_diskon;
-    ?>
+        <!-- TOTAL BELANJA -->
+        <tr style="background:rgba(255,255,255,0.2);font-weight:bold;">
+            <td colspan="4">Total Belanja</td>
+            <td>Rp <?= number_format($totalBelanja,0,',','.') ?></td>
+        </tr>
 
-    <!-- Diskon -->
-    <tr>
-        <td colspan="4" style="text-align:right;font-weight:bold;">Diskon (<?= $diskon_persen ?>%)</td>
-        <td style="font-weight:bold;">- Rp<?= number_format($nilai_diskon, 0, ',', '.'); ?></td>
-    </tr>
+        <!-- DISKON -->
+        <tr style="background:rgba(255,255,255,0.2);font-weight:bold;">
+            <td colspan="4">Diskon (<?= $diskonPersen ?>%)</td>
+            <td>Rp <?= number_format($diskon,0,',','.') ?></td>
+        </tr>
 
-    <!-- Total Pembayaran -->
-    <tr>
-        <td colspan="4" style="text-align:right;font-weight:bold;">Total Pembayaran</td>
-        <td style="font-weight:bold;">Rp<?= number_format($total_setelah_diskon, 0, ',', '.'); ?></td>
-    </tr>
-
-    <!-- Uang Bayar -->
-    <tr>
-        <td colspan="4" style="text-align:right;font-weight:bold;">Uang Bayar</td>
-        <td style="font-weight:bold;">Rp<?= number_format($uang_bayar, 0, ',', '.'); ?></td>
-    </tr>
-
-    <!-- Kembalian -->
-    <tr>
-        <td colspan="4" style="text-align:right;font-weight:bold;">Kembalian</td>
-        <td style="font-weight:bold;">Rp<?= number_format($kembalian, 0, ',', '.'); ?></td>
-    </tr>
-</tbody>
+        <!-- TOTAL BAYAR -->
+        <tr style="background:rgba(255,255,255,0.2);font-weight:bold;">
+            <td colspan="4">Total Bayar</td>
+            <td>Rp <?= number_format($totalBayar,0,',','.') ?></td>
+        </tr>
     </table>
-    <div class="footer">
-        © <?= date("Y"); ?> SKY MART • Dashboard Modern
-    </div>
-</div>
+    <div class="footer">© <?= date("Y"); ?> SKY MART • Dashboard Modern</div>
+<script>
+    const barangData = <?= json_encode($dataBarang); ?>;
 
+    const kodeSelect = document.getElementById("kode");
+    const namaInput = document.getElementById("nama");
+    const hargaInput = document.getElementById("harga");
+
+    kodeSelect.addEventListener("change", function () {
+        let kode = this.value;
+
+        if (barangData[kode]) {
+            namaInput.value = barangData[kode].nama;
+            hargaInput.value = barangData[kode].harga;
+        } else {
+            namaInput.value = "";
+            hargaInput.value = "";
+        }
+    });
+</script>
+</div>
 </body>
 </html>
